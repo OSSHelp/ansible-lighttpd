@@ -1,0 +1,8 @@
+---
+- name: install
+  include_tasks: install.yml
+  when: lighttpd_setup == "full" or lighttpd_setup == "install"
+
+- name: configure
+  import_tasks: configure.yml
+  when: lighttpd_setup == "full" or lighttpd_setup == "configure"

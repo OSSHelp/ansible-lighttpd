@@ -1,0 +1,25 @@
+---
+lighttpd_setup: full
+
+lighttpd_server_status: yes
+lighttpd_src_conf_location: 'files/lighttpd/conf-available'
+
+lighttpd_server_modules:
+  - mod_access
+  - mod_alias
+  - mod_compress
+  - mod_redirect
+
+lighttpd_global_params:
+  server_document_root: '/var/www/html'
+  server_upload_dirs: '( "/var/cache/lighttpd/uploads" )'
+  server_errorlog: '/var/log/lighttpd/error.log'
+  server_pid_file: '/var/run/lighttpd.pid'
+  server_username: 'www-data'
+  server_groupname: 'www-data'
+  server_port: '80'
+  index_file_names: '( "index.php", "index.html", "index.lighttpd.html" )'
+  url_access_deny: '( "~", ".inc" )'
+  static_file_exclude_extensions: '( ".php", ".pl", ".fcgi" )'
+  compress_cache_dir: '/var/cache/lighttpd/compress/'
+  compress_filetype: '( "application/javascript", "text/css", "text/html", "text/plain" )'

@@ -1,0 +1,28 @@
+server.modules = (
+{% for entry in lighttpd_server_modules %}
+        "{{ entry }}",
+{% endfor %}
+)
+
+server.document-root        = "{{ lighttpd_global_params.server_document_root }}"
+server.upload-dirs          = {{ lighttpd_global_params.server_upload_dirs }}
+server.errorlog             = "{{ lighttpd_global_params.server_errorlog }}"
+server.pid-file             = "{{ lighttpd_global_params.server_pid_file }}"
+server.username             = "{{ lighttpd_global_params.server_username }}"
+server.groupname            = "{{ lighttpd_global_params.server_groupname }}"
+server.port                 = {{ lighttpd_global_params.server_port }}
+
+
+index-file.names            = {{ lighttpd_global_params.index_file_names }}
+url.access-deny             = {{ lighttpd_global_params.url_access_deny }}
+static-file.exclude-extensions = {{ lighttpd_global_params.static_file_exclude_extensions }}
+
+compress.cache-dir          = "{{ lighttpd_global_params.compress_cache_dir }}"
+compress.filetype           = {{ lighttpd_global_params.compress_filetype }}
+
+
+# default listening port for IPv6 falls back to the IPv4 port
+## Use ipv6 if available
+#include_shell "/usr/share/lighttpd/use-ipv6.pl " + server.port
+include_shell "/usr/share/lighttpd/create-mime.assign.pl"
+include_shell "/usr/share/lighttpd/include-conf-enabled.pl"

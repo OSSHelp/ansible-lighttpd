@@ -1,0 +1,62 @@
+---
+- name: gather required facts
+  setup:
+    gather_subset: [min, virtual]
+  when: ansible_distribution_release is not defined
+
+- name: Prepare main configuration file
+  template:
+    src: lighttpd.j2
+    dest: /etc/lighttpd/lighttpd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart lighttpd
+  when: ansible_distribution_release != 'focal'
+
+- name: prepare main configuration file for focal
+  template:
+    src: lighttpd_focal.j2
+    dest: /etc/lighttpd/lighttpd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart lighttpd
+  when: ansible_distribution_release == 'focal'
+
+- name: copy custom confs
+  copy:
+    src: "{{ src_conf_location }}/"
+    dest: "/etc/lighttpd/conf-available/"
+    owner: root
+    group: root
+    mode: '0700'
+  when: copy_custom_conf is defined
+
+- name: enable lighttpd confs
+  file:
+    src: "/etc/lighttpd/conf-available/{{ item }}.conf"
+    dest: "/etc/lighttpd/conf-enabled/{{ item }}.conf"
+    state: link
+  loop: "{{ lighttpd_confs_enabled }}"
+  notify: restart lighttpd
+  when: lighttpd_confs_enabled is defined
+
+- name: enable server status
+  block:
+    - name: edit server status conf
+      lineinfile:
+        path: /etc/lighttpd/conf-available/10-status.conf
+        regexp: '# status.status-url'
+        line: 'status.status-url = "/server-status"'
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: enable server status conf
+      file:
+        src: "/etc/lighttpd/conf-available/10-status.conf"
+        dest: "/etc/lighttpd/conf-enabled/10-status.conf"
+        state: link
+      notify: restart lighttpd
+  when: lighttpd_server_status

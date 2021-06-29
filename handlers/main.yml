@@ -1,0 +1,5 @@
+---
+- name: restart lighttpd
+  systemd:
+    state: restarted
+    name: lighttpd
